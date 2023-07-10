@@ -221,6 +221,7 @@ int ReadREACCSAtom(Fortran_FILE *fp, struct reaccs_atom_t *ap)
    {
       SplitChargeRadical(charge_radical, &ap->charge, &ap->radical);
       GetBuffer(fp);
+      fprintf(stderr, "*** 6) fp->buffer %s\n", fp->buffer);
       return(FORTRAN_NORMAL);
    }
    else
@@ -368,6 +369,7 @@ int ReadREACCSBond(Fortran_FILE *fp, struct reaccs_bond_t *bp)
    if (nitems >= 3)
    {
       GetBuffer(fp);
+      fprintf(stderr, "*** 7) fp->buffer %s\n", fp->buffer);
       return(FORTRAN_NORMAL);
    }
    else
@@ -727,11 +729,13 @@ int ReadREACCSMolecule(Fortran_FILE *fp,
    int n_sgroups, n_3d;
    char regtext[20];
 
+   fprintf(stderr, "*** 1) ReadREACCSMolecule\n");
    if (IsNULL(mp))
    {
 fprintf(stderr, "ReadREACCSMolecule: null molecule pointer\n");
        return(FORTRAN_ERROR);
    }
+   if (fp->filep) rewind(fp->filep);
 
    // set some safe defaults
    mp->name[0] = '\0';
@@ -793,12 +797,14 @@ fprintf(stderr, "ReadREACCSMolecule: fp->status(2) = %d\n", fp->status);
       return(fp->status);
    }
 
+   fprintf(stderr, "*** 2) fp->buffer %s\n", fp->buffer);
    strncpy(mp->name,fp->buffer,MAXNAME);
    mp->name[MAXNAME] = '\0';
    GetBuffer(fp);
    if (fp->status != FORTRAN_NORMAL) return(fp->status);
 
    strncpy(buffer,fp->buffer,MAX_BUFFER);
+   fprintf(stderr, "*** 3) fp->buffer %s\n", fp->buffer);
    BlankToZero(buffer+22);
    strcpy(mp->dimensionality,"2D");
    mp->user_initials[0] = '\0'; mp->program_name[0] = '\0';
@@ -825,9 +831,11 @@ fprintf(stderr, "ReadREACCSMolecule: fp->status(2) = %d\n", fp->status);
    GetBuffer(fp);
    if (fp->status != FORTRAN_NORMAL) return(fp->status);
 
+   fprintf(stderr, "*** 4) fp->buffer %s\n", fp->buffer);
    strncpy(mp->comment,fp->buffer,MDL_MAXLINE);
    GetBuffer(fp);
    if (fp->status != FORTRAN_NORMAL) return(fp->status);
+   fprintf(stderr, "*** 4a) fp->buffer %s\n", fp->buffer);
    RemoveTrailingBlanks(mp->comment);
 
    strncpy(buffer,fp->buffer,MAX_BUFFER);
@@ -948,6 +956,7 @@ fprintf(stderr, "ReadREACCSMolecule: fp->status(2) = %d\n", fp->status);
        {
           GetBuffer(fp);
           if (fp->status != FORTRAN_NORMAL) return(fp->status);
+          fprintf(stderr, "*** 5) fp->buffer %s\n", fp->buffer);
        }
        else
        {
